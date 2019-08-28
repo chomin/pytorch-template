@@ -28,6 +28,8 @@ class Trainer(BaseTrainer):
         self.do_validation = self.valid_data_loader is not None
         self.lr_scheduler = lr_scheduler
         self.log_step = int(np.sqrt(data_loader.batch_size))
+        self.train_loss: float = 0.0
+        self.val_loss: float = 0.0
 
     def _eval_metrics(self, output, target):
         acc_metrics = np.zeros(len(self.metrics))
@@ -80,8 +82,9 @@ class Trainer(BaseTrainer):
             if batch_idx == self.len_epoch:
                 break
 
+        self.train_loss = total_loss / self.len_epoch
         log = {
-            'loss': total_loss / self.len_epoch,
+            'loss': self.train_loss,
             'metrics': (total_metrics / self.len_epoch).tolist()
         }
 
@@ -123,8 +126,9 @@ class Trainer(BaseTrainer):
         for name, p in self.model.named_parameters():
             self.writer.add_histogram(name, p, bins='auto')
 
+        self.val_loss = total_val_loss / len(self.valid_data_loader)
         return {
-            'val_loss': total_val_loss / len(self.valid_data_loader),
+            'val_loss': self.val_loss,
             'val_metrics': (total_val_metrics / len(self.valid_data_loader)).tolist()
         }
 

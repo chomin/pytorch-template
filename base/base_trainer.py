@@ -1,3 +1,5 @@
+from typing import TypeVar, List, Tuple
+
 import torch
 from abc import abstractmethod
 from numpy import inf
