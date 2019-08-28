@@ -1,6 +1,6 @@
 {
     "name": "Mnist_LeNet",
-    "n_gpu": 1,
+    "n_gpu": 2,
 
     "arch": {
         "type": "MnistModel",
@@ -9,8 +9,8 @@
     "data_loader": {
         "type": "MnistDataLoader",
         "args":{
-            "data_dir": "data/",
-            "batch_size": 128,
+            "data_dir": "~/data/",
+            "batch_size": 256,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 2
