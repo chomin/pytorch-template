@@ -9,7 +9,7 @@ from parse_config import ConfigParser
 from trainer import Trainer
 
 
-def main(config):
+def main(config: ConfigParser):
     logger = config.get_logger('train')
 
     # setup data_loader instances
