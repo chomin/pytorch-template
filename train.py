@@ -1,13 +1,15 @@
 import argparse
 import collections
 import torch
+import mlflow
+import mlflow.pytorch
 import data_loader.data_loaders as module_data
 import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
 from parse_config import ConfigParser
 from trainer import Trainer
-from logger import MLFlow
+# from logger import MLFlow
 
 
 def main(config: ConfigParser):
@@ -41,7 +43,7 @@ def main(config: ConfigParser):
     logger = config.get_logger('trainer', config['trainer']['verbosity'])
     cfg_trainer = config['trainer']
 
-    mlflow = MLFlow(config.log_dir, logger, cfg_trainer['mlflow'])
+    # mlflow = MLFlow(config.log_dir, logger, cfg_trainer['mlflow'])  # mlflow.start_run()で__enter__()を実行できるようにする必要がある。一旦棚上げ。
     with mlflow.start_run() as run:
         # Log args into mlflow
         for key, value in vars(args).items():
