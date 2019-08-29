@@ -43,7 +43,9 @@ def main(config: ConfigParser):
     logger = config.get_logger('trainer', config['trainer']['verbosity'])
     cfg_trainer = config['trainer']
 
-    # mlflow = MLFlow(config.log_dir, logger, cfg_trainer['mlflow'])  # mlflow.start_run()で__enter__()を実行できるようにする必要がある。一旦棚上げ。
+    # mlflow.start_run()で__enter__()を実行できるようにする必要がある。一旦棚上げ。
+    # mlflow = MLFlow(config.log_dir, logger, cfg_trainer['mlflow'])
+
     with mlflow.start_run() as run:
         # Log args into mlflow
         for key, value in vars(args).items():
