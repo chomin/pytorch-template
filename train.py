@@ -1,5 +1,6 @@
 import argparse
 import collections
+import sys
 import torch
 import mlflow
 import mlflow.pytorch
@@ -13,6 +14,7 @@ from trainer import Trainer
 
 
 def main(config: ConfigParser):
+
     logger = config.get_logger('train')
 
     # setup data_loader instances
@@ -48,7 +50,7 @@ def main(config: ConfigParser):
 
     with mlflow.start_run() as run:
         # Log args into mlflow
-        for key, value in vars(args).items():
+        for key, value in config.config.items():
             mlflow.log_param(key, value)
 
         # Log results into mlflow
