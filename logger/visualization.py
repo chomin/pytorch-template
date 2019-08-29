@@ -5,21 +5,16 @@ from utils import Timer
 class MLFlow:
     def __init__(self, log_dir, logger, enabled):
         self.mlflow = None
-        self.selected_module = ""
 
         if enabled:
             log_dir = str(log_dir)
 
-            # Retrieve vizualization writer.
-            succeeded = False
-            for module in ["mlflow"]:
-                try:
-                    self.mlflow = importlib.import_module(module)
-                    succeeded = True
-                    break
-                except ImportError:
-                    succeeded = False
-                self.selected_module = module
+            # Retrieve visualization writer.
+            try:
+                self.mlflow = importlib.import_module("mlflow")
+                succeeded = True
+            except ImportError:
+                succeeded = False
 
             if not succeeded:
                 message = "Warning: visualization (mlflow) is configured to use, but currently not installed on " \
@@ -30,8 +25,11 @@ class MLFlow:
         self.step = 0
         self.mode = ''
 
+        self.mlflow_ftns_with_tag_and_value = {
+            'log_param', 'log_metric'
+        }
         self.mlflow_ftns = {
-            'log_param', 'log_metric', 'start_run'
+            'start_run'
         }
         # self.tag_mode_exceptions = {'add_histogram', 'add_embedding'}
 
@@ -53,7 +51,7 @@ class MLFlow:
         Otherwise:
             return a blank function handle that does nothing
         """
-        if name in self.mlflow_ftns:
+        if name in self.mlflow_ftns_with_tag_and_value:
             add_data = getattr(self.mlflow, name, None)
 
             def wrapper(tag, data, *args, **kwargs):
@@ -61,7 +59,18 @@ class MLFlow:
                     # add mode(train/valid) tag
                     if name not in self.tag_mode_exceptions:
                         tag = '{}/{}'.format(tag, self.mode)
-                    add_data(tag, data, self.step, *args, **kwargs)
+                    add_data(tag, data, *args, **kwargs)
+
+            return wrapper
+        elif name in self.mlflow_ftns:
+            add_data = getattr(self.mlflow, name, None)
+
+            def wrapper(*args, **kwargs):
+                if add_data is not None:
+                    # add mode(train/valid) tag
+                    # if name not in self.tag_mode_exceptions:
+                    #     tag = '{}/{}'.format(tag, self.mode)
+                    add_data(*args, **kwargs)
 
             return wrapper
         else:
