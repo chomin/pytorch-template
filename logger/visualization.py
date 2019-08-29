@@ -14,7 +14,7 @@ class MLFlow:
             succeeded = False
             for module in ["mlflow"]:
                 try:
-                    self.mlflow = importlib.import_module(module).SummaryWriter(log_dir)
+                    self.mlflow = importlib.import_module(module)
                     succeeded = True
                     break
                 except ImportError:
