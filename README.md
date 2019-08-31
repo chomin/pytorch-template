@@ -381,6 +381,28 @@ If you need more visualizations, use `add_scalar('tag', data)`, `add_image('tag'
 
 **Note**: You don't have to specify current steps, since `WriterTensorboard` class defined at `logger/visualization.py` will track current steps.
 
+* **mlflow Usage**
+
+1. **Install**
+
+    `pip install mlflow`
+
+<!--- 2. **Run training** 
+
+    Set `tensorboard` option in config file to:
+    Set the "tensorboard" entry in the config to:
+    ```
+     "tensorboard" :{
+        "enabled": true,
+        "modules": ["tensorboardX", "torch.utils.tensorboard"]
+    }
+    ```
+-->
+3. **Open mlflow server** 
+
+    Type `mlflow server` at the project root, then server will open at `http://localhost:5000`
+
+
 ## Contributing
 Feel free to contribute any kind of function or enhancement, here the coding style follows PEP8
 
@@ -398,6 +420,8 @@ Code should pass the [Flake8](http://flake8.pycqa.org/en/latest/) check before c
 - [x] Iteration-based training (instead of epoch-based)
 - [x] Adding command line option for fine-tuning
 - [x] Multi-GPU support
+
+- [ ] Do not import mlflow if false in config
 
 ## License
 This project is licensed under the MIT License. See  LICENSE for more details
