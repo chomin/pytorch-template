@@ -57,7 +57,7 @@ def main(config: ConfigParser):
         for loss in trainer.train_loss_list:
             mlflow.log_metric('train_loss', loss)
         for loss in trainer.val_loss_list:
-            mlflow.log_metric('val_loss', trainer.val_loss_list)
+            mlflow.log_metric('val_loss', loss)
 
         # Log other info
         # mlflow.log_param('loss_type', 'CrossEntropy')
