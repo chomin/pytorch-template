@@ -1,6 +1,8 @@
 import argparse
 import collections
 import sys
+import requests
+import socket
 import torch
 import mlflow
 import mlflow.pytorch
@@ -11,6 +13,7 @@ import model.model as module_arch
 from parse_config import ConfigParser
 from trainer import Trainer
 from collections import OrderedDict
+from line_notify_bot import LINENotifyBot
 # from logger import MLFlow
 
 
@@ -72,7 +75,14 @@ def main(config: ConfigParser):
         # mlflow.log_param('loss_type', 'CrossEntropy')
 
         # Log model
-        mlflow.pytorch.log_model(model, "model")
+        mlflow.pytorch.log_model(model, 'model')
+
+    access_token = ''
+    with open('./pytorch_line_token') as f:
+        access_token = str(f.readline())
+    bot = LINENotifyBot(access_token=access_token)
+
+    bot.send(message=f'{config["name"]}の訓練が終了しました。@{socket.gethostname()}')
 
 
 if __name__ == '__main__':
