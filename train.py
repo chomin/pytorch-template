@@ -10,6 +10,7 @@ import model.metric as module_metric
 import model.model as module_arch
 from parse_config import ConfigParser
 from trainer import Trainer
+from collections import OrderedDict
 # from logger import MLFlow
 
 
@@ -51,7 +52,15 @@ def main(config: ConfigParser):
     with mlflow.start_run() as run:
         # Log args into mlflow
         for key, value in config.config.items():
-            mlflow.log_param(key, value)
+            if isinstance(value, OrderedDict):
+                for sub_key, sub_value in value.items():
+                    if isinstance(sub_value, OrderedDict):
+                        for sub2_key, sub2_value in sub_value.items():
+                            mlflow.log_param(f'{key}-{sub_key}-{sub2_key}', sub2_value)
+                    else:
+                        mlflow.log_param(f'{key}-{sub_key}', sub_value)
+            else:
+                mlflow.log_param(key, value)
 
         # Log results into mlflow
         for loss in trainer.train_loss_list:
