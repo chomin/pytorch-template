@@ -19,6 +19,11 @@ from line_notify_bot import LINENotifyBot
 
 def main(config: ConfigParser):
 
+    access_token = ''
+    with open('./pytorch_line_token') as f:
+        access_token = str(f.readline())
+    bot = LINENotifyBot(access_token=access_token)
+
     logger = config.get_logger('train')
 
     # setup data_loader instances
@@ -76,11 +81,6 @@ def main(config: ConfigParser):
 
         # Log model
         mlflow.pytorch.log_model(model, 'model')
-
-    access_token = ''
-    with open('./pytorch_line_token') as f:
-        access_token = str(f.readline())
-    bot = LINENotifyBot(access_token=access_token)
 
     bot.send(message=f'{config["name"]}の訓練が終了しました。@{socket.gethostname()}')
 
