@@ -9,7 +9,6 @@ verify_ssl = true
 torch = "*"
 torchvision = "*"
 tensorboardx = "*"
-mlflow = "*"
 
 [requires]
 python_version = "3.7"

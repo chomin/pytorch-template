@@ -1,20 +1,15 @@
 import argparse
 import collections
-import sys
 import torch
-import mlflow
-import mlflow.pytorch
 import data_loader.data_loaders as module_data
 import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
 from parse_config import ConfigParser
 from trainer import Trainer
-# from logger import MLFlow
 
 
-def main(config: ConfigParser):
-
+def main(config):
     logger = config.get_logger('train')
 
     # setup data_loader instances
@@ -42,28 +37,6 @@ def main(config: ConfigParser):
                       lr_scheduler=lr_scheduler)
 
     trainer.train()
-    logger = config.get_logger('trainer', config['trainer']['verbosity'])
-    cfg_trainer = config['trainer']
-
-    # mlflow.start_run()で__enter__()を実行できるようにする必要がある。一旦棚上げ。
-    # mlflow = MLFlow(config.log_dir, logger, cfg_trainer['mlflow'])
-
-    with mlflow.start_run() as run:
-        # Log args into mlflow
-        for key, value in config.config.items():
-            mlflow.log_param(key, value)
-
-        # Log results into mlflow
-        for loss in trainer.train_loss_list:
-            mlflow.log_metric('train_loss', loss)
-        for loss in trainer.val_loss_list:
-            mlflow.log_metric('val_loss', loss)
-
-        # Log other info
-        # mlflow.log_param('loss_type', 'CrossEntropy')
-
-        # Log model
-        mlflow.pytorch.log_model(model, "model")
 
 
 if __name__ == '__main__':
