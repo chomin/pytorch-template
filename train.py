@@ -17,6 +17,19 @@ from line_notify_bot import LINENotifyBot
 # from logger import MLFlow
 
 
+def log_params(conf: OrderedDict, parent_key: str = None):
+    for key, value in conf.items():
+        if parent_key is not None:
+            combined_key = f'{parent_key}-{key}'
+        else:
+            combined_key = key
+
+        if not isinstance(value, OrderedDict):
+            mlflow.log_param(combined_key, value)
+        else:
+            log_params(value, combined_key)
+
+
 def main(config: ConfigParser):
 
     access_token = ''
@@ -59,16 +72,7 @@ def main(config: ConfigParser):
 
     with mlflow.start_run() as run:
         # Log args into mlflow
-        for key, value in config.config.items():
-            if isinstance(value, OrderedDict):
-                for sub_key, sub_value in value.items():
-                    if isinstance(sub_value, OrderedDict):
-                        for sub2_key, sub2_value in sub_value.items():
-                            mlflow.log_param(f'{key}-{sub_key}-{sub2_key}', sub2_value)
-                    else:
-                        mlflow.log_param(f'{key}-{sub_key}', sub_value)
-            else:
-                mlflow.log_param(key, value)
+        log_params(config.config)
 
         # Log results into mlflow
         for loss in trainer.train_loss_list:
