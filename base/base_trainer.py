@@ -63,6 +63,7 @@ class BaseTrainer:
         """
         Full training logic
         """
+        not_improved_count = 0
         for epoch in range(self.start_epoch, self.epochs + 1):
             result = self._train_epoch(epoch)
 
@@ -92,7 +93,6 @@ class BaseTrainer:
                                         "Model performance monitoring is disabled.".format(self.mnt_metric))
                     self.mnt_mode = 'off'
                     improved = False
-                    not_improved_count = 0
 
                 if improved:
                     self.mnt_best = log[self.mnt_metric]
