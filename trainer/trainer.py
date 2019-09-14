@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from tqdm import tqdm
 from typing import List
 from torchvision.utils import make_grid
 from base import BaseTrainer
@@ -59,30 +60,35 @@ class Trainer(BaseTrainer):
 
         total_loss = 0
         total_metrics = np.zeros(len(self.metrics))
-        for batch_idx, (data, target) in enumerate(self.data_loader):
-            data, target = data.to(self.device), target.to(self.device)
+        with tqdm(self.data_loader) as progress:
+            for batch_idx, (data, target) in enumerate(progress):
+                progress.set_description_str(f'Train epoch {epoch}')
+                data, target = data.to(self.device), target.to(self.device)
 
-            self.optimizer.zero_grad()
-            output = self.model(data)
-            loss = self.loss(output, target)
-            loss.backward()
-            self.optimizer.step()
+                self.optimizer.zero_grad()
+                output = self.model(data)
+                loss = self.loss(output, target)
+                loss.backward()
+                self.optimizer.step()
 
-            self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
-            self.writer.add_scalar('loss', loss.item())
-            self.train_loss_list.append(loss.item())
-            total_loss += loss.item()
-            total_metrics += self._eval_metrics(output, target)
+                self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
+                self.writer.add_scalar('loss', loss.item())
+                self.train_loss_list.append(loss.item())
+                total_loss += loss.item()
+                total_metrics += self._eval_metrics(output, target)
 
-            if batch_idx % self.log_step == 0:
-                self.logger.debug('Train Epoch: {} {} Loss: {:.6f}'.format(
-                    epoch,
-                    self._progress(batch_idx),
-                    loss.item()))
-                self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
+                if batch_idx % self.log_step == 0:
+                    progress.set_postfix_str(' {} Loss: {:.6f}'.format(
+                        self._progress(batch_idx),
+                        loss.item()))
+                    # self.logger.debug('Train Epoch: {} {} Loss: {:.6f}'.format(
+                    #     epoch,
+                    #     self._progress(batch_idx),
+                    #     loss.item()))
+                    self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
 
-            if batch_idx == self.len_epoch:
-                break
+                if batch_idx == self.len_epoch:
+                    break
 
         log = {
             'loss': total_loss / self.len_epoch,
@@ -111,18 +117,20 @@ class Trainer(BaseTrainer):
         total_val_loss = 0
         total_val_metrics = np.zeros(len(self.metrics))
         with torch.no_grad():
-            for batch_idx, (data, target) in enumerate(self.valid_data_loader):
-                data, target = data.to(self.device), target.to(self.device)
+            with tqdm(self.valid_data_loader) as progress
+                for batch_idx, (data, target) in enumerate(progress):
+                    progress.set_description_str(f'Valid epoch {epoch}')
+                    data, target = data.to(self.device), target.to(self.device)
 
-                output = self.model(data)
-                loss = self.loss(output, target)
+                    output = self.model(data)
+                    loss = self.loss(output, target)
 
-                self.writer.set_step((epoch - 1) * len(self.valid_data_loader) + batch_idx, 'valid')
-                self.writer.add_scalar('loss', loss.item())
-                self.val_loss_list.append(loss.item())
-                total_val_loss += loss.item()
-                total_val_metrics += self._eval_metrics(output, target)
-                self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
+                    self.writer.set_step((epoch - 1) * len(self.valid_data_loader) + batch_idx, 'valid')
+                    self.writer.add_scalar('loss', loss.item())
+                    self.val_loss_list.append(loss.item())
+                    total_val_loss += loss.item()
+                    total_val_metrics += self._eval_metrics(output, target)
+                    self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
 
         # add histogram of model parameters to the tensorboard
         for name, p in self.model.named_parameters():
