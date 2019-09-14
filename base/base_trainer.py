@@ -1,5 +1,6 @@
 from typing import TypeVar, List, Tuple
 import torch
+import tqdm
 from abc import abstractmethod
 from numpy import inf
 from logger import TensorboardWriter
@@ -63,7 +64,7 @@ class BaseTrainer:
         Full training logic
         """
         not_improved_count = 0
-        for epoch in range(self.start_epoch, self.epochs + 1):
+        for epoch in tqdm(range(self.start_epoch, self.epochs + 1)):
             result = self._train_epoch(epoch)
 
             # save logged informations into log dict
