@@ -1,6 +1,6 @@
 from typing import TypeVar, List, Tuple
 import torch
-import tqdm
+from tqdm import tqdm
 from abc import abstractmethod
 from numpy import inf
 from logger import TensorboardWriter
