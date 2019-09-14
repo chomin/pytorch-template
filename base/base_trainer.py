@@ -64,7 +64,7 @@ class BaseTrainer:
         Full training logic
         """
         not_improved_count = 0
-        for epoch in tqdm(range(self.start_epoch, self.epochs + 1)):
+        for epoch in tqdm(range(self.start_epoch, self.epochs + 1), desc='Total progress: '):
             result = self._train_epoch(epoch)
 
             # save logged informations into log dict
