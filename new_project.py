@@ -14,6 +14,6 @@ project_name = Path(sys.argv[1])
 target_dir = current_dir / project_name
 
 ignore = [".git", "data", "saved", "new_project.py", "LICENSE", ".flake8", "README.md", "__pycache__",
-          "pytorch_line_token"]
+          "pytorch_line_token", "mlruns"]
 copytree(current_dir, target_dir, ignore=ignore_patterns(*ignore))
 print('New project initialized at', target_dir.absolute().resolve())
